@@ -42,7 +42,7 @@ file(READ "./codal.json" codal_json)
 sbeParseJson(codal codal_json)
 
 set(CODAL_APP_OUTPUT_DIR ".")
-set(CODAL_APP_SOURCE_DIR "source")
+set(CODAL_APP_SOURCE_DIR "source-teak")
 
 if("${codal.application}" STRGREATER "")
     set(CODAL_APP_SOURCE_DIR "${codal.application}")

@@ -10,6 +10,6 @@
   "extraIncludes": [
     "yotta_modules/"
   ],
-  "bin": "./source",
+  "bin": "./source-teak",
   "scripts": {}
 }

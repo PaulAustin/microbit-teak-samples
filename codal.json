@@ -8,8 +8,14 @@
         "dev": true
     } ,
     "config":{
-        "NO_BLE": 1,
-        "MICROBIT_BLE_ENABLED" : 0,
-        "MICROBIT_BLE_PAIRING_MODE": 0
+        "NRF_SDH_BLE_SERVICE_CHANGED" : 1,
+        "DEVICE_BLE" : 1,
+        "MICROBIT_BLE_ENABLED" : 1,
+        "MICROBIT_BLE_PAIRING_MODE": 1,
+        "MICROBIT_BLE_DEVICE_INFORMATION_SERVICE": 1,
+        "MICROBIT_BLE_DFU_SERVICE": 0,
+        "MICROBIT_BLE_EVENT_SERVICE" : 0,
+        "MICROBIT_BLE_OPEN": 1,
+        "MICROBIT_BLE_SECURITY_LEVEL": "SECURITY_MODE_ENCRYPTION_OPEN_LINK"
     }
 }
