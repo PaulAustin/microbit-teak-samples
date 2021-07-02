@@ -72,6 +72,7 @@ void onDisconnected(MicroBitEvent)
 
 void onDelim(MicroBitEvent)
 {
+    uBit.display.print("P");
     uBit.serial.send("[MSG]: ");
     ManagedString r = uart->readUntil(";", ASYNC);
     uBit.serial.send(r);

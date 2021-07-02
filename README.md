@@ -62,3 +62,14 @@ This repository is designed to follow the principles and APIs developed for the 
 
 # Documentation
 API documentation is embedded in the code using doxygen. We will produce integrated web-based documentation soon.
+
+# This project is a branch for testing out the teak runtime on trashbots.
+
+Key change is adding an option to compile the codal runtime with nordic compliant BLE UART service
+
+for debugging, if the device is usins the serial output
+
+Type screen /dev/cu.usbmodem1422 115200, replacing the 'usbmodem' number with the number you found in the previous step. This will open the micro:bit's serial output and show all messages received from the device. 
+
+That short instruction comes form here:
+https://support.microbit.org/support/solutions/articles/19000022103-outputing-serial-data-from-the-micro-bit-to-a-computer

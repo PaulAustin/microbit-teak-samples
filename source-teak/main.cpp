@@ -56,7 +56,7 @@ int main()
 
     // uBit.serial.
 
-    uBit.display.scroll("4SDG");
+    uBit.display.scroll("3SDG");
 
     uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_CLICK, onButtonA);
     // uBit.messageBus.listen(MICROBIT_ID_BLE_UART, MICROBIT_UART_S_EVT_DELIM_MATCH, onDelim);
