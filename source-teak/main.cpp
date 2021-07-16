@@ -23,26 +23,19 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <stdio.h>
 #include <MicroBit.h>
+#include "MicroBitUARTServiceFixed.h"
 #include "TeakTask.h"
 #include "TBCDriver.h"
-#include "BLETest.h"
 
 MicroBit uBit;
-// MicroBitI2C i2c = MicroBitI2C(I2C_SDA0, I2C_SCL0);
-// MicroBitStorage storage;
-// MicroBitThermometer thermometer(storage);
+MicroBitI2C i2c = MicroBitI2C(I2C_SDA0, I2C_SCL0);
+
+MicroBitStorage storage;
+MicroBitThermometer thermometer(storage);
 
 char buffer [20];
 short versionNumber;
 bool connected;
-
-void task_tests();
-
-void onButtonA(MicroBitEvent)
-{
-    uBit.display.scroll("BUTTON A");
-}
-
 int main()
 {
     // Initialise the micro:bit runtime.
@@ -50,72 +43,69 @@ int main()
     TBCInit();
     spi.format(8, 3);
     spi.frequency(1000000);
-    // gTaskManager.Setup();
-  	versionNumber = -10;
-  	connected = false;
+    gTaskManager.Setup();
+	versionNumber = -10;
+	connected = false;
+    // Run the main loop
+    MicroBitEvent tick(MICROBIT_ID_TIMER, 0, CREATE_ONLY);
+    int tickCount = 0;
 
-    // uBit.serial.
+    PlayNoteStream(ksNoteL8th);
+    PlayNoteStream(ksNoteC4);
+    PlayNoteStream(ksNoteD4);
+    PlayNoteStream(ksNoteE4);
+    PlayNoteStream(ksNoteF4);
+    PlayNoteStream(ksNoteG4);
+    PlayNoteStream(ksNoteA5);
+    PlayNoteStream(ksNoteB5);
+    PlayNoteStream(ksNoteC5);
 
-    uBit.display.scroll("3SDG");
 
-    uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_CLICK, onButtonA);
-    // uBit.messageBus.listen(MICROBIT_ID_BLE_UART, MICROBIT_UART_S_EVT_DELIM_MATCH, onDelim);
+    const char* accMessage = "(ac:%d)";
+    const char* tempMessage = "(tp:%d)";
 
+    while(1) {
+		// uBit.serial.send("still here 1");
+        tickCount++;
+		// uBit.serial.send("still here 2");
+        fiber_sleep(50);
+		// uBit.serial.send("still here 3");
+        tick.value = tickCount;
+		// uBit.serial.send("still here 4");
+        gTaskManager.MicrobitDalEvent(tick);
+		// uBit.serial.send("still here 5");
+        
+        //processAccelerometerData(accelerometerData);
+		if (connected)
+		{
+			int accelerometerData = uBit.accelerometer.getX();
+			// uBit.serial.send("still here 6");
+			snprintf(buffer, sizeof(buffer), accMessage, accelerometerData);
+			// uBit.serial.send(buffer);
+			// uBit.serial.send("still here 7");
+			uart->send((uint8_t *)buffer, strlen(buffer));
+			// uBit.serial.send("still here 8");
 
-    //uBit.display.scroll('A');
+			//processThermometerData(thermometerData);
+			int thermometerData = thermometer.getTemperature();
+			// uBit.serial.send("still here 9");
+			snprintf(buffer, sizeof(buffer), tempMessage, thermometerData);
+			// uBit.serial.send(buffer);
+			uart->send((uint8_t *)buffer, strlen(buffer)); //causes crash when app connects then disconnects
+			// uBit.serial.send("still here 11");
+			// uBit.serial.send(" ");
+			// uBit.serial.send(versionNumber);
+			if (versionNumber > 0)
+			{
+				const char* versionMessage = "(vs:%d)";
+				snprintf(buffer, sizeof(buffer), versionMessage, versionNumber);
+				// uBit.serial.send(buffer);
+				uart->send((uint8_t *)buffer, strlen(buffer));
+			}
+		}
+		// uBit.serial.send(tickCount);
+		// uBit.serial.send("\r\n");
 
-    // fiber_sleep(1000);
-
-    // audio_sound_expression_test();
-    // audio_virtual_pin_melody();
-
-    // task_tests();
-
-    ble_test();
-
-    // uBit.display.scroll("GOODBYE!");
-
-    // while(1) {
-    //   uBit.sleep(500);
-    // }
-}
-
-void task_tests() {
-
-    // audio test
-    MicrobitBtEvent("(nt:1)");
-    fiber_sleep(100);
-    MicrobitBtEvent("(nt:2)");
-    fiber_sleep(100);
-    MicrobitBtEvent("(nt:3)");
-    fiber_sleep(100);
-    MicrobitBtEvent("(nt:4)");
-    fiber_sleep(100);
-    MicrobitBtEvent("(nt:5)");
-    fiber_sleep(100);
-    MicrobitBtEvent("(nt:6)");
-    fiber_sleep(100);
-    MicrobitBtEvent("(nt:7)");
-    fiber_sleep(100);
-    MicrobitBtEvent("(nt:8)");
-
-    // motor test
-    MicrobitBtEvent("(m:(1 2) d:100)");
-    fiber_sleep(1000);
-    MicrobitBtEvent("(m:(1 2) d:-100)");
-    fiber_sleep(1000);
-    MicrobitBtEvent("(m:(1 2) d:0)");
-
-    // pixel image test
-    for (int i = 0; i < 5; i++) {
-      MicrobitBtEvent("(px:000a00110e:1)");
-      fiber_sleep(1000);
-      MicrobitBtEvent("(px:1f1f1f1f1f:1)");
-      fiber_sleep(1000);
     }
-
-    // print test
-    MicrobitBtEvent("(pr:101)");
-    MicrobitBtEvent("(pr:202)");
-    MicrobitBtEvent("(pr:303)");
+    // release_fiber();
 }
