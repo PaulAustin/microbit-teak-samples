@@ -64,6 +64,7 @@ events.
 TeakTaskManager gTaskManager;
 
 ManagedString eom(";");
+
 MicroBitUARTService *uart;
 
 //------------------------------------------------------------------------------
@@ -126,12 +127,8 @@ void TeakTaskManager::Setup()
     // Note GATT table size increased from default in MicroBitConfig.h
     // #define MICROBIT_SD_GATT_TABLE_SIZE             0x500
 
-//    uart->eventOn(";");
-
-    uBit.display.scroll("OPEN");
-
     uart = new MicroBitUARTService(*uBit.ble, 61, 60);
-    uart->eventOn(";", ASYNC);
+    uart->eventOn(eom, ASYNC);
 }
 
 //------------------------------------------------------------------------------
@@ -328,11 +325,9 @@ int PBmapUnpack(int pbmap, uint8_t* bytes, int width)
     int bits = pbmap;
     uint8_t* rowBytes = bytes;
     for (int i=0; i < 5; i++) {
-        rowBytes[0] = (bits & (0x01 << 4));
-        rowBytes[1] = (bits & (0x01 << 3));
-        rowBytes[2] = (bits & (0x01 << 2));
-        rowBytes[3] = (bits & (0x01 << 1));
-        rowBytes[4] = (bits & (0x01 << 0));
+        for (int j=0; j < 5; j++) {
+            rowBytes[j] = (bits & (0x01 << (4-j))) ? 128 : 0;
+        }
         rowBytes += width;
         bits = bits >> 5;
     }
@@ -412,11 +407,11 @@ void TeakTaskManager::MicrobitBtEvent(MicroBitEvent)
           str++;
           char c2 = hexCharToInt(*str);
           str++;
-          image.setPixelValue(0, i, c1 & 0x01);
-          image.setPixelValue(1, i, c2 & 0x08);
-          image.setPixelValue(2, i, c2 & 0x04);
-          image.setPixelValue(3, i, c2 & 0x02);
-          image.setPixelValue(4, i, c2 & 0x01);
+          image.setPixelValue(0, i, (c1 & 0x01) ? 255 : 0);
+          image.setPixelValue(1, i, (c2 & 0x08) ? 255 : 0);
+          image.setPixelValue(2, i, (c2 & 0x04) ? 255 : 0);
+          image.setPixelValue(3, i, (c2 & 0x02) ? 255 : 0);
+          image.setPixelValue(4, i, (c2 & 0x01) ? 255 : 0);
       }
       uBit.display.print(image);
   } else if ((strncmp(str, "(sr:", 4) == 0) && len >= 5) {

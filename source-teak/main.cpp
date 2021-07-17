@@ -39,7 +39,6 @@ int main()
 {
     // Initialise the micro:bit runtime.
     uBit.init();
-    uBit.display.scroll("A");
 
     TBCInit();
     spi.format(8, 3);
@@ -50,8 +49,6 @@ int main()
     // Run the main loop
     MicroBitEvent tick(MICROBIT_ID_TIMER, 0, CREATE_ONLY);
     int tickCount = 0;
-
-    uBit.display.scroll("Z");
 
     PlayNoteStream(ksNoteL8th);
     PlayNoteStream(ksNoteC4);
@@ -66,8 +63,6 @@ int main()
     const char* accMessage = "(ac:%d)";
     const char* tempMessage = "(tp:%d)";
 
-    uBit.display.scroll("3SDG");
-/*
     while(1) {
 		// uBit.serial.send("still here 1");
         tickCount++;
@@ -111,7 +106,6 @@ int main()
 		// uBit.serial.send("\r\n");
 
     }
-	*/
 
     release_fiber();
 }
