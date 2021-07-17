@@ -23,15 +23,14 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <stdio.h>
 #include <MicroBit.h>
-#include "MicroBitUARTServiceFixed.h"
+#include "MicroBitUARTService.h"
 #include "TeakTask.h"
 #include "TBCDriver.h"
 
 MicroBit uBit;
-MicroBitI2C i2c = MicroBitI2C(I2C_SDA0, I2C_SCL0);
+//MicroBitI2C i2c = MicroBitI2C(I2C_SDA0, I2C_SCL0);
 
-MicroBitStorage storage;
-MicroBitThermometer thermometer(storage);
+MicroBitThermometer thermometer;
 
 char buffer [20];
 short versionNumber;
@@ -40,6 +39,8 @@ int main()
 {
     // Initialise the micro:bit runtime.
     uBit.init();
+    uBit.display.scroll("A");
+
     TBCInit();
     spi.format(8, 3);
     spi.frequency(1000000);
@@ -49,6 +50,8 @@ int main()
     // Run the main loop
     MicroBitEvent tick(MICROBIT_ID_TIMER, 0, CREATE_ONLY);
     int tickCount = 0;
+
+    uBit.display.scroll("Z");
 
     PlayNoteStream(ksNoteL8th);
     PlayNoteStream(ksNoteC4);
@@ -60,10 +63,11 @@ int main()
     PlayNoteStream(ksNoteB5);
     PlayNoteStream(ksNoteC5);
 
-
     const char* accMessage = "(ac:%d)";
     const char* tempMessage = "(tp:%d)";
 
+    uBit.display.scroll("3SDG");
+/*
     while(1) {
 		// uBit.serial.send("still here 1");
         tickCount++;
@@ -107,5 +111,7 @@ int main()
 		// uBit.serial.send("\r\n");
 
     }
-    // release_fiber();
+	*/
+
+    release_fiber();
 }

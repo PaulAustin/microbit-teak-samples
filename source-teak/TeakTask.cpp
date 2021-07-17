@@ -19,7 +19,8 @@ DEALINGS IN THE SOFTWARE.
 
 #include <MicroBit.h>
 #include <ctype.h>
-#include "MicroBitUARTServiceFixed.h"
+#include <algorithm>
+#include "MicroBitUARTService.h"
 #include "TeakTask.h"
 #include "TBCDriver.h"
 extern MicroBit uBit;
@@ -63,7 +64,7 @@ events.
 TeakTaskManager gTaskManager;
 
 ManagedString eom(";");
-MicroBitUARTServiceFixed *uart;
+MicroBitUARTService *uart;
 
 //------------------------------------------------------------------------------
 TeakTask::TeakTask() {
@@ -124,8 +125,13 @@ void TeakTaskManager::Setup()
 
     // Note GATT table size increased from default in MicroBitConfig.h
     // #define MICROBIT_SD_GATT_TABLE_SIZE             0x500
-    uart = new MicroBitUARTServiceFixed(*uBit.ble, 32, 32);
-    uart->eventOn(eom, ASYNC);
+
+//    uart->eventOn(";");
+
+    uBit.display.scroll("OPEN");
+
+    uart = new MicroBitUARTService(*uBit.ble, 61, 60);
+    uart->eventOn(";", ASYNC);
 }
 
 //------------------------------------------------------------------------------
@@ -142,15 +148,13 @@ void TeakTaskManager::SwitchTo(TeakTask* task)
 FLASH_STR_DEFINE(gStrA, "(a)");
 FLASH_STR_DEFINE(gStrB, "(b)");
 FLASH_STR_DEFINE(gStrAB, "(ab)");
+FLASH_STR_DEFINE(gStrCS, "(cs)");
+FLASH_STR_DEFINE(gStrCF, "(cf)");
 
 void TeakTaskManager::calibrate()
 {
-  char buffer [20];
-  const char* message = "(cs)";
-  snprintf(buffer, sizeof(buffer), message);
-  uart->send((uint8_t *)buffer, strlen(buffer));
+  uart->send(FLASH_STRU(gStrCS), FLASH_STR_LEN(gStrCS));
   //uBit.serial.send(buffer);
-
 
   const int FIRST_VALUE = 0xDEADBEEF;
   int prevEncod1 = FIRST_VALUE;
@@ -192,8 +196,8 @@ void TeakTaskManager::calibrate()
     if (revolutions == THRESHOLD)
     {
 
-        sort(one_values,one_values+THRESHOLD);
-        sort(two_values,two_values+THRESHOLD);
+        std::sort(one_values, one_values+THRESHOLD);
+        std::sort(two_values, two_values+THRESHOLD);
 
 
         //int temp = 1.0 * (sum2-sum1) / sum2 * test_power;
@@ -235,9 +239,7 @@ void TeakTaskManager::calibrate()
         }
     }
   }
-  message = "(cf)";
-  snprintf(buffer, sizeof(buffer), message);
-  uart->send((uint8_t *)buffer, strlen(buffer));
+  uart->send(FLASH_STRU(gStrCF), FLASH_STR_LEN(gStrCF));
   //uBit.serial.send(buffer);
 }
 
@@ -267,7 +269,7 @@ void TeakTaskManager::MicrobitDalEvent(MicroBitEvent event)
         //}
     } else if (event.value == MICROBIT_BUTTON_EVT_CLICK || event.value == MICROBIT_BUTTON_EVT_HOLD) {
          if (event.source == MICROBIT_ID_BUTTON_A) {
-          uart->send(FLASH_STRU(gStrA), FLASH_STR_LEN(gStrA));
+           uart->send(FLASH_STRU(gStrA), FLASH_STR_LEN(gStrA));
          } else if (event.source == MICROBIT_ID_BUTTON_B) {
            uart->send(FLASH_STRU(gStrB), FLASH_STR_LEN(gStrB));
          } else if (event.source == MICROBIT_ID_BUTTON_AB) {
@@ -359,12 +361,13 @@ int PBmapUnpack(int pbmap, uint8_t* bytes, int width)
 void setAdvertising(bool state)
 {
     if (state) {
-        uBit.bleManager.setTransmitPower(6);
-        uBit.bleManager.ble->setAdvertisingInterval(200);
-        uBit.bleManager.ble->gap().setAdvertisingTimeout(0);
-        uBit.bleManager.ble->gap().startAdvertising();
+        uBit.ble->setTransmitPower(6);
+        // TODO??? still needed? no so easy with codal
+        // uBit.ble->setAdvertisingInterval(200);
+        // uBit.ble->gap().setAdvertisingTimeout(0);
+        uBit.ble->advertise();
     } else {
-        uBit.bleManager.stopAdvertising();
+        uBit.ble->stopAdvertising();
     }
 }
 

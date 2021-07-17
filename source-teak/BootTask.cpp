@@ -21,15 +21,13 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <MicroBit.h>
-#include "MicroBitUARTServiceFixed.h"
+#include "MicroBitUARTService.h"
+
 #include "TeakTask.h"
 #include "TBCDriver.h"
 extern MicroBit uBit;
 
-
-
 /*
-
 Remote values when motor 2 set to 100:s
 2 72
 2 72
